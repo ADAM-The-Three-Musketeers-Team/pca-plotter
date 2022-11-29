@@ -1,4 +1,4 @@
-
+import {getDataset as getIrisDataset} from 'ml-dataset-iris';
 
 // Delay func for simulating data loading process
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -36,4 +36,14 @@ window.syncFn = () => {
         [1,2,3],
         [4,5,6]
     ];
+}
+
+
+/**
+ * A function that returns an IRIS flower dataset
+ * More info: https://github.com/mljs/dataset-iris
+ * @returns {(number | string)[][]}
+ */
+window.loadIrisDataset = async () => {
+    return getIrisDataset();
 }
