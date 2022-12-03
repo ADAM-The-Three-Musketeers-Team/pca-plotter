@@ -30,7 +30,7 @@ class PcaPlot extends DataVis {
         let lastDataPointElementIsAString = typeof data[0][dataPointLength-1] === 'string';
 
 
-        console.log(data[0]);
+        // console.log(data[0]);
 
         data.forEach((dataPoint, dataPointIndex) => {
             if(!dataPointsHaveSameTypes) {
@@ -104,29 +104,29 @@ class PcaPlot extends DataVis {
      * Analyses and visualises data from the "data" class field
      */
     analyzeAndVisualizeData() {
-        // let results = getPcaResults(this.data);
-        // console.log(results);
-        //
-        // let data = [{
-        //     x: results.x,
-        //     y: results.y,
-        //     type: 'scatter',
-        //     mode: 'markers',
-        //     marker: { size: 12 }
-        // }];
-        //
-        // let layout = {
-        //     title: 'Scatter plot example',
-        //     // showLegend: false
-        // }
-        //
-        // let config = {
-        //     scrollZoom: true,
-        //     displayModeBar: false,
-        // }
-        //
-        //
-        // Plotly.newPlot(this.plotSpace, data, layout, config);
+        let results = getPcaResults(this.data);
+        console.log(results);
+
+        let data = [{
+            x: results.x,
+            y: results.y,
+            type: 'scatter',
+            mode: 'markers',
+            marker: { size: 12 }
+        }];
+
+        let layout = {
+            title: 'Scatter plot example',
+            // showLegend: false
+        }
+
+        let config = {
+            scrollZoom: true,
+            displayModeBar: false,
+        }
+
+
+        Plotly.newPlot(this.plotSpace, data, layout, config);
         // this.plotSpace.innerHTML = this.data;
     }
 }

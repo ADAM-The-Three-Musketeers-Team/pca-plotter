@@ -1,21 +1,32 @@
 import { Matrix } from 'ml-matrix';
 
 
-
+https://www.turing.com/kb/guide-to-principal-component-analysis
 export function getPcaResults(dataset) {
-    console.log();
-    return;
-    let matrixDataset = getMatrix(dataset);
-    console.log(matrixDataset);
+    // get last items, which should be names
+    let datasetNames = dataset.map((el) => {
+        return el[el.length-1];
+    });
+
+    // console.log(datasetNames);
+
+    // get all elements except the last one (which is name)
+    let datasetValues = dataset.map((el) => {
+        return el.slice(0,-1)
+    });
+
+    let matrixDataset = getMatrix(datasetValues);
+
     matrixDataset = centerDataset(matrixDataset)
+    console.log(matrixDataset);
 
 
+    let results = {x:[], y:[], z:[], k:[]};
 
-    let results = {x:[], y:[]};
-
-    dataset.forEach((el, index) => {
+    matrixDataset.to2DArray().forEach((el, index) => {
         results.x[index] = el[0];
         results.y[index] = el[1];
+
     })
 
     return results;
@@ -28,14 +39,15 @@ function centerDataset(matrixDataset) {
         throw ("matrixDataset should be an instance of a Matrix");
     }
 
-    findMean(matrixDataset);
+    // subtract each column's mean from each value of the column
+    for(let colIndex = 0; colIndex < matrixDataset.columns; colIndex++) {
+        let column = matrixDataset.getColumnVector(colIndex);
 
-    let centeredDataset = [];
-    return centeredDataset;
-}
+        column.sub(column.mean());
+        matrixDataset.setColumn(colIndex, column);
+    }
 
-function findMean(matrixDataset) {
-    return matrixDataset.mean();
+    return matrixDataset;
 }
 
 function getMatrix(dataset) {
