@@ -106,18 +106,40 @@ class PcaPlot extends DataVis {
     analyzeAndVisualizeData() {
         let results = getPcaResults(this.data);
         console.log(results);
+        let uniqueNames = results.name.filter(onlyUnique);
+
+        let colorsList = [
+            'rgb(255, 0, 0)',
+            'rgb(0, 255, 0)',
+            'rgb(0, 0, 255)'
+        ]
+
+        let colors = [];
+        results.name.forEach((el, index) => {
+            colors[index] = colorsList[uniqueNames.indexOf(el)];
+        });
+
 
         let data = [{
             x: results.x,
             y: results.y,
             type: 'scatter',
             mode: 'markers',
-            marker: { size: 12 }
+            marker: {
+                size: 12,
+                color: colors
+            },
+
         }];
 
         let layout = {
             title: 'Scatter plot example',
-            // showLegend: false
+            showLegend: true,
+            legend: {
+                x: 1,
+                xanchor: 'right',
+                y: 1
+            }
         }
 
         let config = {
@@ -129,6 +151,10 @@ class PcaPlot extends DataVis {
         Plotly.newPlot(this.plotSpace, data, layout, config);
         // this.plotSpace.innerHTML = this.data;
     }
+}
+
+function onlyUnique(value, index, self) {
+    return self.indexOf(value) === index;
 }
 
 /**

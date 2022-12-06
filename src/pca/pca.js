@@ -1,8 +1,10 @@
 import {covariance, Matrix} from 'ml-matrix';
+import { eigs } from 'mathjs'
 
 
 // https://www.turing.com/kb/guide-to-principal-component-analysis
 // https://www.kaggle.com/code/shrutimechlearn/step-by-step-pca-with-iris-dataset/notebook
+// https://wiki.pathmind.com/eigenvector#covariance
 export function getPcaResults(dataset) {
     // get last items, which should be names
     let datasetNames = dataset.map((el) => {
@@ -17,17 +19,23 @@ export function getPcaResults(dataset) {
 
     let matrixDataset = getMatrix(datasetValues);
 
-    matrixDataset = standardise(matrixDataset)
-    let covarianceMatrix = getCovarianceMatrix(matrixDataset);
+    let standardisedDataset = standardise(matrixDataset)
+    let covarianceMatrix = getCovarianceMatrix(standardisedDataset);
+    let featureVectors = getFeatureVectors(covarianceMatrix);
+
+    console.log("featureVectors:", featureVectors);
+
+    let finalDataset = standardisedDataset.mmul(featureVectors);
 
     //Calculate the eigenvalues and eigenvectors for the covariance matrix
 
 
-    let results = {x:[], y:[], z:[], k:[]};
+    let results = {x:[], y:[], name:[]};
 
-    matrixDataset.to2DArray().forEach((el, index) => {
-        results.x[index] = el[0];
-        results.y[index] = el[1];
+    finalDataset.to2DArray().forEach((el, index) => {
+        results.x[index] = el[1];
+        results.y[index] = el[0];
+        results.name[index] = datasetNames[index];
     })
 
     return results;
@@ -69,6 +77,20 @@ function standardise(matrixDataset) {
  */
 function getCovarianceMatrix(standardizedMatrixDataset) {
     return covariance(standardizedMatrixDataset);
+}
+
+function getFeatureVectors(covarianceMatrix) {
+    // values and vectors are already sorted in INCREASING order by the library
+    let eigenObj = eigs(covarianceMatrix.to2DArray());
+
+    // get the last 2 values and make them our new basis
+    let lastItemIndex = eigenObj.vectors.length-1;
+
+    return new Matrix([
+        eigenObj.vectors[lastItemIndex],
+        eigenObj.vectors[lastItemIndex - 1]
+    ]).transpose();
+
 }
 
 function getMatrix(dataset) {

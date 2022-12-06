@@ -1,6 +1,6 @@
  .plot-space {
-     height: 500px;
-     width: 100%;
+     height: 1000px;
+     width: 1000px;
      /*display: block;*/
      border: 1px black dashed;
      display: flex;
