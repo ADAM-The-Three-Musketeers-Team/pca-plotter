@@ -1,24 +1,26 @@
-import { Matrix } from 'ml-matrix';
+import {covariance, Matrix} from 'ml-matrix';
 
 
 // https://www.turing.com/kb/guide-to-principal-component-analysis
+// https://www.kaggle.com/code/shrutimechlearn/step-by-step-pca-with-iris-dataset/notebook
 export function getPcaResults(dataset) {
     // get last items, which should be names
     let datasetNames = dataset.map((el) => {
         return el[el.length-1];
     });
 
-    // console.log(datasetNames);
-
     // get all elements except the last one (which is name)
     let datasetValues = dataset.map((el) => {
+        // alternative: change this column to a number representing title
         return el.slice(0,-1)
     });
 
     let matrixDataset = getMatrix(datasetValues);
 
     matrixDataset = standardise(matrixDataset)
-    console.log(matrixDataset);
+    let covarianceMatrix = getCovarianceMatrix(matrixDataset);
+
+    //Calculate the eigenvalues and eigenvectors for the covariance matrix
 
 
     let results = {x:[], y:[], z:[], k:[]};
@@ -26,7 +28,6 @@ export function getPcaResults(dataset) {
     matrixDataset.to2DArray().forEach((el, index) => {
         results.x[index] = el[0];
         results.y[index] = el[1];
-
     })
 
     return results;
@@ -51,8 +52,9 @@ function standardise(matrixDataset) {
     // subtract each column's mean from each value of the column
     for(let colIndex = 0; colIndex < matrixDataset.columns; colIndex++) {
         let column = matrixDataset.getColumnVector(colIndex);
-
+        console.log("mean: ", column.mean());
         column.sub(column.mean()) // subtract column's mean value from each element of the column
+        console.log("std: ", column.standardDeviation());
         column.divide(column.standardDeviation()) // divide each column's element by standard deviation
 
         matrixDataset.setColumn(colIndex, column);
@@ -66,7 +68,7 @@ function standardise(matrixDataset) {
  * @param standardizedMatrixDataset
  */
 function getCovarianceMatrix(standardizedMatrixDataset) {
-
+    return covariance(standardizedMatrixDataset);
 }
 
 function getMatrix(dataset) {
