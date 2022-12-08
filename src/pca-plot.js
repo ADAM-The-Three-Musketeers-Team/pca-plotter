@@ -4,6 +4,18 @@ import {getPcaResults} from "./pca/pca.js";
 import Plotly from "plotly.js-dist";
 
 class PcaPlot extends DataVis {
+    trace = {
+        x: [],
+        y: [],
+        name: 'no name',
+        color: '#000',
+        type: 'scatter',
+        mode: 'markers',
+        marker: {
+            size: 12
+        },
+    };
+
     constructor() {
         super(ShadowStylesStr); // pass css string as an argument
     }
@@ -105,7 +117,7 @@ class PcaPlot extends DataVis {
      */
     analyzeAndVisualizeData() {
         let results = getPcaResults(this.data);
-        console.log(results);
+        console.log("results:", results);
         let uniqueNames = results.name.filter(onlyUnique);
 
         let colorsList = [
@@ -114,31 +126,55 @@ class PcaPlot extends DataVis {
             'rgb(0, 0, 255)'
         ]
 
+        let traces = [];
         let colors = [];
-        results.name.forEach((el, index) => {
-            colors[index] = colorsList[uniqueNames.indexOf(el)];
-        });
+
+        for(let index = 0; index < results.x.length; index++) {
+            let name = results.name[index];
+            let x = results.x[index];
+            let y = results.y[index];
+
+            if(traces[uniqueNames.indexOf(name)] === undefined) {
+                let newTrace = JSON.parse(JSON.stringify(this.trace)); // deep copy an object
+                newTrace.name = name;
+                newTrace.color = colorsList[uniqueNames.indexOf(name)];
+
+                traces[uniqueNames.indexOf(name)] = newTrace;
+            }
+
+            traces[uniqueNames.indexOf(name)].x.push(x)
+            traces[uniqueNames.indexOf(name)].y.push(y)
+        }
+
+        // results.forEach((el, index) => {
+        //
+        // });
+
+        console.log(traces);
 
 
-        let data = [{
-            x: results.x,
-            y: results.y,
-            type: 'scatter',
-            mode: 'markers',
-            marker: {
-                size: 12,
-                color: colors
-            },
 
-        }];
+
 
         let layout = {
-            title: 'Scatter plot example',
+            title: 'PCA plot',
             showLegend: true,
             legend: {
-                x: 1,
-                xanchor: 'right',
-                y: 1
+                x: 0,
+                y: 1,
+                traceorder: 'normal',
+                font: {
+                    family: 'sans-serif',
+                    size: 12,
+                    color: '#000'
+                },
+                bgcolor: '#E2E2E2',
+                bordercolor: '#FFFFFF',
+                borderwidth: 2
+            },
+            hovermode: 'closest',
+            yaxis: {
+                hoverformat: ','
             }
         }
 
@@ -148,7 +184,7 @@ class PcaPlot extends DataVis {
         }
 
 
-        Plotly.newPlot(this.plotSpace, data, layout, config);
+        Plotly.newPlot(this.plotSpace, traces, layout, config);
         // this.plotSpace.innerHTML = this.data;
     }
 }
@@ -158,7 +194,7 @@ function onlyUnique(value, index, self) {
 }
 
 /**
- * Binds the ScatterPlot class to the <scatter-plot> tag, when the page is loaded
+ * Binds the PcaPlot class to the <pca-plot> tag, when the page is loaded
  */
 window.addEventListener('load', () => {
     window.customElements.define('pca-plot', PcaPlot);
