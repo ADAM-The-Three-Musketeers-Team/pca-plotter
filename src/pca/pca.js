@@ -21,16 +21,22 @@ export function getPcaResults(dataset) {
 
     let standardisedDataset = standardise(matrixDataset)
     let covarianceMatrix = getCovarianceMatrix(standardisedDataset);
-    let featureVectors = getFeatureVectors(covarianceMatrix);
+    let principalComponents = getPrincipalComponents(covarianceMatrix);
 
-    console.log("featureVectors:", featureVectors);
+    let finalDataset = standardisedDataset.mmul(principalComponents.vectors);
 
-    let finalDataset = standardisedDataset.mmul(featureVectors);
+    // to get data losses: sum all eigenvalues and use it as 100%
+    // then find how much % each eigenvalue represents
 
-    //Calculate the eigenvalues and eigenvectors for the covariance matrix
-
-
-    let results = {x:[], y:[], name:[]};
+    let results = {
+        fractionsExplained: {
+            byX: principalComponents.values[1],
+            byY: principalComponents.values[0],
+        },
+        x:[],
+        y:[],
+        name:[]
+    };
 
     finalDataset.to2DArray().forEach((el, index) => {
         results.x[index] = el[1];
@@ -60,9 +66,9 @@ function standardise(matrixDataset) {
     // subtract each column's mean from each value of the column
     for(let colIndex = 0; colIndex < matrixDataset.columns; colIndex++) {
         let column = matrixDataset.getColumnVector(colIndex);
-        console.log("mean: ", column.mean());
+
         column.sub(column.mean()) // subtract column's mean value from each element of the column
-        console.log("std: ", column.standardDeviation());
+
         column.divide(column.standardDeviation()) // divide each column's element by standard deviation
 
         matrixDataset.setColumn(colIndex, column);
@@ -79,18 +85,38 @@ function getCovarianceMatrix(standardizedMatrixDataset) {
     return covariance(standardizedMatrixDataset);
 }
 
-function getFeatureVectors(covarianceMatrix) {
+/**
+ * Returns an object with feature vectors and values,
+ * that describe fraction of variance explained by each principal component
+ * @param covarianceMatrix
+ * @returns {{vectors: Matrix, values: *[]}}
+ */
+function getPrincipalComponents(covarianceMatrix) {
     // values and vectors are already sorted in INCREASING order by the library
     let eigenObj = eigs(covarianceMatrix.to2DArray());
 
     // get the last 2 values and make them our new basis
     let lastItemIndex = eigenObj.vectors.length-1;
 
+    return {
+        values: [
+            eigenObj.values[lastItemIndex],
+            eigenObj.values[lastItemIndex - 1]
+        ],
+        vectors: new Matrix([
+                   eigenObj.vectors[lastItemIndex],
+                   eigenObj.vectors[lastItemIndex - 1]
+               ]).transpose()
+    };
+}
+
+function getVarianceFractions(covarianceMatrix) {
+    let lastItemIndex = eigenObj.vectors.length-1;
+
     return new Matrix([
         eigenObj.vectors[lastItemIndex],
         eigenObj.vectors[lastItemIndex - 1]
     ]).transpose();
-
 }
 
 function getMatrix(dataset) {

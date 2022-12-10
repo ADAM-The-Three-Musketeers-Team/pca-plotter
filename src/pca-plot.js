@@ -123,11 +123,14 @@ class PcaPlot extends DataVis {
         let colorsList = [
             'rgb(255, 0, 0)',
             'rgb(0, 255, 0)',
-            'rgb(0, 0, 255)'
+            'rgb(0, 0, 255)',
+            'rgb(255, 255, 0)',
+            'rgb(255, 0, 255)',
+            'rgb(0, 255, 255)',
+            'rgb(0, 0, 0)',
         ]
 
         let traces = [];
-        let colors = [];
 
         for(let index = 0; index < results.x.length; index++) {
             let name = results.name[index];
