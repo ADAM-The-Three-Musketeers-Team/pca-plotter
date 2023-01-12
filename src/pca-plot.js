@@ -2,7 +2,6 @@ import ShadowStylesStr from "./css/shadow-style.css?inline";
 import {DataVis} from "./data-vis.js";
 import {getPcaResults} from "./pca/pca.js";
 import Plotly from "plotly.js-dist";
-import {round} from "mathjs";
 
 class PcaPlot extends DataVis {
     trace = {
@@ -180,7 +179,7 @@ class PcaPlot extends DataVis {
                 }
             }
         }
-        round
+
         let config = {
             scrollZoom: true,
             displayModeBar: false,
