@@ -1,3 +1,4 @@
+// ALl "entry points" should imported here
 import "./css/style.css"
 import "./functions.js"
-import "./scatter-plot.js"
+import "./pca-plot.js"

@@ -12,6 +12,9 @@
     "vite": "^3.2.3"
   },
   "dependencies": {
+    "mathjs": "^11.5.0",
+    "ml-dataset-iris": "^1.2.1",
+    "ml-matrix": "^6.10.4",
     "plotly.js": "^1.47.4",
     "plotly.js-dist": "^2.16.3"
   }
