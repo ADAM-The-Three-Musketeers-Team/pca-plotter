@@ -2,6 +2,7 @@ import ShadowStylesStr from "./css/shadow-style.css?inline";
 import {DataVis} from "./data-vis.js";
 import {getPcaResults} from "./pca/pca.js";
 import Plotly from "plotly.js-dist";
+import {round} from "mathjs";
 
 class PcaPlot extends DataVis {
     trace = {
@@ -149,15 +150,6 @@ class PcaPlot extends DataVis {
             traces[uniqueNames.indexOf(name)].y.push(y)
         }
 
-        // results.forEach((el, index) => {
-        //
-        // });
-
-        console.log(traces);
-
-
-
-
 
         let layout = {
             title: 'PCA plot',
@@ -176,11 +168,19 @@ class PcaPlot extends DataVis {
                 borderwidth: 2
             },
             hovermode: 'closest',
+            xaxis: {
+                title: {
+                    text: `PC-1 (fraction of variance explained: ${results.fractionsExplained["byX"].toFixed(3)})`,
+                }
+            },
             yaxis: {
-                hoverformat: ','
+                hoverformat: ',',
+                title: {
+                    text: `PC-2 (fraction of variance explained: ${results.fractionsExplained["byY"].toFixed(3)})`,
+                }
             }
         }
-
+        round
         let config = {
             scrollZoom: true,
             displayModeBar: false,

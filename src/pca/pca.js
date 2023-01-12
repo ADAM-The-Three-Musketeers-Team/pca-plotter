@@ -1,10 +1,9 @@
 import {covariance, Matrix} from 'ml-matrix';
-import { eigs } from 'mathjs'
+import {eigs, sum} from 'mathjs'
 
-
-// https://www.turing.com/kb/guide-to-principal-component-analysis
-// https://www.kaggle.com/code/shrutimechlearn/step-by-step-pca-with-iris-dataset/notebook
-// https://wiki.pathmind.com/eigenvector#covariance
+/**
+ * @param {null} dataset
+ */
 export function getPcaResults(dataset) {
     // get last items, which should be names
     let datasetNames = dataset.map((el) => {
@@ -23,15 +22,14 @@ export function getPcaResults(dataset) {
     let covarianceMatrix = getCovarianceMatrix(standardisedDataset);
     let principalComponents = getPrincipalComponents(covarianceMatrix);
 
-    let finalDataset = standardisedDataset.mmul(principalComponents.vectors);
+    console.log("pc:", principalComponents);
 
-    // to get data losses: sum all eigenvalues and use it as 100%
-    // then find how much % each eigenvalue represents
+    let finalDataset = standardisedDataset.mmul(principalComponents.vectors);
 
     let results = {
         fractionsExplained: {
-            byX: principalComponents.values[1],
-            byY: principalComponents.values[0],
+            byX: principalComponents.fractions[1],
+            byY: principalComponents.fractions[0],
         },
         x:[],
         y:[],
@@ -89,19 +87,22 @@ function getCovarianceMatrix(standardizedMatrixDataset) {
  * Returns an object with feature vectors and values,
  * that describe fraction of variance explained by each principal component
  * @param covarianceMatrix
- * @returns {{vectors: Matrix, values: *[]}}
+ * @returns {{vectors: Matrix, fractions: *[]}}
  */
 function getPrincipalComponents(covarianceMatrix) {
     // values and vectors are already sorted in INCREASING order by the library
     let eigenObj = eigs(covarianceMatrix.to2DArray());
 
+    let fractions = getVarianceFractions(eigenObj.values);
     // get the last 2 values and make them our new basis
     let lastItemIndex = eigenObj.vectors.length-1;
 
+    console.log(fractions[lastItemIndex], fractions[lastItemIndex-1]);
+
     return {
-        values: [
-            eigenObj.values[lastItemIndex],
-            eigenObj.values[lastItemIndex - 1]
+        fractions: [
+            fractions[lastItemIndex],
+            fractions[lastItemIndex - 1]
         ],
         vectors: new Matrix([
                    eigenObj.vectors[lastItemIndex],
@@ -110,13 +111,21 @@ function getPrincipalComponents(covarianceMatrix) {
     };
 }
 
-function getVarianceFractions(covarianceMatrix) {
-    let lastItemIndex = eigenObj.vectors.length-1;
+/**
+ * @param {math.MathCollection} eigenObjValues
+ */
+function getVarianceFractions(eigenObjValues) {
+    // to get data losses: sum all eigenvalues and use it as 100%
+    // then find how much % each eigenvalue represents
 
-    return new Matrix([
-        eigenObj.vectors[lastItemIndex],
-        eigenObj.vectors[lastItemIndex - 1]
-    ]).transpose();
+    let valuesSum = sum(eigenObjValues);
+
+    let fractions = [];
+    eigenObjValues.forEach((val) => {
+        fractions.push(val / valuesSum);
+    });
+
+    return fractions;
 }
 
 function getMatrix(dataset) {
