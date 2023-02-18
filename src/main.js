@@ -1,4 +1,4 @@
-// ALl "entry points" should imported here
+// ALl "entry points" should be imported here
 import "./css/style.css"
 import "./functions.js"
 import "./pca-plot.js"
